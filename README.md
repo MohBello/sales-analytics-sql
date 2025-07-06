@@ -36,22 +36,69 @@ The goal was to extract actionable insights from sales data using SQL alone, wit
 ## 📊 Sample Queries & Insights
 
 ### 🔹 Total Sales by Month
-```sql
 SELECT DATE_FORMAT(order_date, '%Y-%m') AS month, SUM(...) AS total_sales
 
-💡 Insight: Shows business growth over time. Can highlight seasonal patterns.
+```sql
+SELECT 
+    DATE_FORMAT(order_date, '%Y-%m') AS month,
+    SUM(quantity * price - discount) AS total_sales,
+    SUM(profit) AS total_profit
+FROM orders
+JOIN order_items USING(order_id)
+GROUP BY month
+ORDER BY month;
 ```
+
+💡 Insight: Shows business growth over time. Can highlight seasonal patterns.
+
 
 ### 🔹 Top 3 Customers per Month
-```sql
 RANK() OVER (PARTITION BY month ORDER BY revenue DESC)
 
-💡 Insight: Helps target loyal customers for retention campaigns.
+```sql
+WITH ranked_customers AS (
+    SELECT 
+        DATE_FORMAT(order_date, '%Y-%m') AS month,
+        customer_name,
+        SUM(quantity * price - discount) AS total_spent,
+        RANK() OVER (
+            PARTITION BY DATE_FORMAT(order_date, '%Y-%m') 
+            ORDER BY SUM(quantity * price - discount) DESC
+        ) AS rank_in_month
+    FROM orders
+    JOIN customers USING(customer_id)
+    JOIN order_items USING(order_id)
+    GROUP BY month, customer_name
+)
+
+SELECT *
+FROM ranked_customers
+WHERE rank_in_month <= 3
+ORDER BY month, rank_in_month;
 ```
+
+💡 Insight: Helps target loyal customers for retention campaigns.
 
 ### 🔹 High-Margin Products
-```sql
 WITH ... profit_margin > 0.2 (20%)
 
-💡 Insight: Supports promotion and pricing decisions. Helps identify promotable products for better profitability.
+```sql
+WITH product_profit_margin AS (
+    SELECT 
+        product_id,
+        product_name,
+        SUM(profit) AS total_profit,
+        SUM(quantity * price - discount) AS total_revenue,
+        ROUND(SUM(profit) / NULLIF(SUM(quantity * price - discount), 0), 2) AS profit_margin
+    FROM order_items
+    JOIN products USING(product_id)
+    GROUP BY product_id, product_name
+)
+SELECT *
+FROM product_profit_margin
+WHERE profit_margin > 0.2
+ORDER BY profit_margin DESC;
 ```
+
+💡 Insight: Supports promotion and pricing decisions. Helps identify promotable products for better profitability.
+
