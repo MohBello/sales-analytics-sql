@@ -1,0 +1,5 @@
+"customer_id","customer_name","segment","city","state","country","region"
+1,"Bob Smith","Consumer","New York","NY","USA","East"
+2,"Alice Johnson","Coporate","Los Angeles","CA","USA","West"
+3,"Charlie Lee","Home Office","Chicago","IL","USA","Centre"
+4,"Diana King","Consumer","Houston","TX","USA","South"
