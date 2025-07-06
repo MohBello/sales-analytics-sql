@@ -39,13 +39,16 @@ The goal was to extract actionable insights from sales data using SQL alone, wit
 ```sql
 SELECT DATE_FORMAT(order_date, '%Y-%m') AS month, SUM(...) AS total_sales
 💡 Insight: Shows business growth over time. Can highlight seasonal patterns.
+```
 
 ### 🔹 Top 3 Customers per Month
 ```sql
 RANK() OVER (PARTITION BY month ORDER BY revenue DESC)
 💡 Insight: Helps target loyal customers for retention campaigns.
+```
 
 ### 🔹 High-Margin Products
+```sql
 WITH ... profit_margin > 0.2 (20%)
 💡 Insight: Supports promotion and pricing decisions. Helps identify promotable products for better profitability.
-
+```
